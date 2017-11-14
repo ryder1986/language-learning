@@ -32,6 +32,7 @@ using std:: vector;
 #include <iostream>
 using std::cout; using std::endl;
 #include <string>
+#include <string.h>
 using std::string;
 
 // implement strcmp-like generic compare function 
