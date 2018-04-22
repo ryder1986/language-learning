@@ -28,61 +28,74 @@
 */ 
 
 #include <iostream>
-using std::cout; using std::endl;
+#include <string>
+#include <strstream>
+using std::cout; using std::endl;using std::string;using std::strstream;
 
 #include "Queue.h"
 
 Queue<int> queue1;
+Queue<string> queue2;
 
 int main() 
 {
-    for (int ix = 0; ix != 1024; ++ix)
-        queue1.push(ix);
-    
-    for (int ix = 0; ix != 1024; ++ix) {
-        int i = queue1.front();  // check next item
-        if (i != ix)
-             cout << "Something's wrong! i = " << i
-                  << " ix = " << ix << endl;
-        queue1.pop();   // and remove it
-    }
+	strstream ss;
+	ss<<123;
+	  for (int ix = 0; ix != 1024; ++ix){
+		  queue2.push(ss.str());
+	  }
+	  cout<<queue2;
+//	  for (int ix = 0; ix != 1024; ++ix){
+//
+//	  }
 
-    if (!queue1.empty())
-        cout << "Queue is not empty but should be!" << endl;
-    else
-        cout << "OK, queue empty again" << endl;
-
-
-    for (int ix = 0; ix != 1024; ++ix)
-        queue1.push(ix);
-
-    Queue<int> queue2(queue1);  // use copy constructor
-
-    for (int ix = 0; ix != 1024; ++ix) {
-        int i = queue2.front();   // check next item
-        if (i != ix)
-             cout << "Something's wrong! i = " << i
-                  << " ix = " << ix << endl;
-        queue2.pop();  // and remove it
-    }
-
-    if (!queue2.empty())
-        cout << "queue2 is not empty but should be!" << endl;
-    else
-        cout << "OK, queue2 empty again" << endl;
-
-    queue2 = queue1;  // use asssignment operator
-    for (int ix = 0; ix != 1024; ++ix) {
-        int i = queue2.front();
-        if (i != ix)
-             cout << "Something's wrong! i = " << i
-                  << " ix = " << ix << endl;
-        queue2.pop();
-    }
-
-    if (!queue2.empty())
-        cout << "queue2 is not empty but should be!" << endl;
-    else
-        cout << "OK, queue2 empty again" << endl;
+//    for (int ix = 0; ix != 1024; ++ix)
+//        queue1.push(ix);
+//    cout<<queue1;
+//    for (int ix = 0; ix != 1024; ++ix) {
+//        int i = queue1.front();  // check next item
+//        if (i != ix)
+//             cout << "Something's wrong! i = " << i
+//                  << " ix = " << ix << endl;
+//        queue1.pop();   // and remove it
+//    }
+//
+//    if (!queue1.empty())
+//        cout << "Queue is not empty but should be!" << endl;
+//    else
+//        cout << "OK, queue empty again" << endl;
+//
+//
+//    for (int ix = 0; ix != 1024; ++ix)
+//        queue1.push(ix);
+//
+//    Queue<int> queue2(queue1);  // use copy constructor
+//
+//    for (int ix = 0; ix != 1024; ++ix) {
+//        int i = queue2.front();   // check next item
+//        if (i != ix)
+//             cout << "Something's wrong! i = " << i
+//                  << " ix = " << ix << endl;
+//        queue2.pop();  // and remove it
+//    }
+//
+//    if (!queue2.empty())
+//        cout << "queue2 is not empty but should be!" << endl;
+//    else
+//        cout << "OK, queue2 empty again" << endl;
+//
+//    queue2 = queue1;  // use asssignment operator
+//    for (int ix = 0; ix != 1024; ++ix) {
+//        int i = queue2.front();
+//        if (i != ix)
+//             cout << "Something's wrong! i = " << i
+//                  << " ix = " << ix << endl;
+//        queue2.pop();
+//    }
+//
+//    if (!queue2.empty())
+//        cout << "queue2 is not empty but should be!" << endl;
+//    else
+//        cout << "OK, queue2 empty again" << endl;
     
 }

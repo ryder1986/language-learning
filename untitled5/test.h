@@ -103,10 +103,11 @@ class Test
 public:
     Test()
     {
-        auto tmp=std::bind(&Test::fun,"f1!");
-       t.StartTimer(100,tmp );
+        auto tmp=std::bind(&Test::fun,this);
+       t.StartTimer(1000,tmp );
+    //    cout<<"22"<<endl;
     }
-    void fun(std::string&& s)
+    void fun()
     {
         cout<<"11"<<endl;
     }

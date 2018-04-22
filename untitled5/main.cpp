@@ -13,6 +13,7 @@ void EchoFunc(std::string&& s){
 #include "test.h"
 int main(){
     Test t;
+  //  cout<<"333"<<endl;
 #if 0
     Timer t1;
     Timer t2;
