@@ -26,6 +26,7 @@ int WaitTcpConnect(int sock, unsigned long msec, char * ip, unsigned short * por
 int ConnectTcpClient(int sock, char * ip, unsigned short port);
 
 int RecvDataByTcp(int sock,char* buf,int len);
+int RecvDataByTcp1(int sock,char* buf,int len);
 int SendDataByTcp(int sock, char * buffer, int len);
 
 int CreateTcpClientSock(unsigned short port, int timeoutsec);

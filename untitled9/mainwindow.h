@@ -8,79 +8,111 @@
 #include <sys/ioctl.h>
 using namespace std;
 #include "csocket.h"
+#define BUF_SIZE 10
 class Session{
-    public:
-    Session(int fd)
+public:
+    Session(int fd,string ip,int port):quit(false),client_ip(ip),
+        client_port(port)
     {
         skt=fd;
         int ul = 0;
-        ioctl(fd, FIONBIO, &ul); //设置为阻塞模式
-//        auto func_send=bind(&Session::send,this);
-//        std::thread([func_send](){
-//           // std::this_thread::sleep_for(std::chrono::milliseconds(after));
-//            func_send();
-//        }).detach();
-         cout<<"new connection"<<endl;
+        ioctl(fd, FIONBIO, &ul);
+        cout<<"new connection"<<endl;
         auto func_recv=bind(&Session::recv,this);
-        std::thread([func_recv](){
-           // std::this_thread::sleep_for(std::chrono::milliseconds(after));
-            func_recv();
-        }).detach();
+
+        trd=new thread([func_recv](){func_recv();});
     }
+    ~Session()
+    {
+         cout<<"session deleteing "<<ip()<<endl;
+        quit=true;
+        trd->join();
+        delete trd;
+
+    }
+
     int send(char *buf,int len)
     {
-         int ret= SendDataByTcp(skt,buf,len);
-         if(ret){
-              cout<<"send  "<<ret<<" bytes"<<endl;
-         }else{
-              cout<<"send  fail"<<endl;
-         }
-//        while(1){
-//            this_thread::sleep_for(chrono::seconds(1));
-//        }
+        int ret= SendDataByTcp(skt,buf,len);
+        if(ret){
+            cout<<"send  "<<ret<<" bytes"<<endl;
+        }else{
+            cout<<"send  fail"<<endl;
+        }
     }
     int recv()
     {
-        while(1){
-          int ret=RecvDataByTcp(skt,buf,1000);
-          if(ret){
-             cout<<"read  "<<ret<<" bytes"<<endl;
-          }else{
+        while(!quit){
+            int ret=RecvDataByTcp1(skt,buf,BUF_SIZE);
+            if(ret){
+                cout<<"read  "<<ret<<" bytes"<<endl;
+            }else{
                 cout<<"ret  "<<ret<<endl;
-                  cout<<"socket maybe closed,retry read after 1sec"  <<endl;
-                  this_thread::sleep_for(chrono::seconds(1));
-          }
+                break;
+                cout<<"socket maybe closed,retry read after 1sec"  <<endl;
+                this_thread::sleep_for(chrono::seconds(1));
+            }
+
         }
+        end_this(this);
     }
+    string ip()
+    {
+        return client_ip;
+    }
+    int port()
+    {
+        return client_port;
+    }
+
 
 private:
     int skt;
-    char buf[1000];
-};
+    bool quit;
+    char buf[BUF_SIZE];
+    std::thread *trd;
+    string client_ip;
+    int client_port;
+public:
+    function <void(Session *)> end_this=[](Session *){ cout<<"we  can quit now"<<endl;};
 
+};
+#define IP_STR_LEN 20
+#include <cstring>
+#include <algorithm>
 class Tcpserver{
 public:
-    Tcpserver(int p):port(p)
+    Tcpserver(int p):port(p),quit(false)
     {
         fd= StartTcpServerSock(port,1000,1000);
         auto func=bind(&Tcpserver::listen,this);
-
-        std::thread([func](){
-           // std::this_thread::sleep_for(std::chrono::milliseconds(after));
-            func();
-        }).detach();
+        trd=new thread([func](){func();});
+    }
+    ~Tcpserver()
+    {
+        quit=true;
+        trd->join();
+        int sz=clients.size();
+        for(int i=sz-1;i>=0;i--)
+        {
+            delete clients[i];
+            clients.pop_back();
+        }
+        delete trd;
     }
 
     void listen()
     {
-        while(1){
-            cout<<"listening again"<<endl;
-           int cl_fd=WaitTcpConnect(fd,1,NULL,NULL);
+        while(!quit){
+
+            memset(peer_ip,0,IP_STR_LEN);
+            int cl_fd=WaitTcpConnect(fd,1,peer_ip,&peer_port);
             if(cl_fd>0){
-                Session *s=new Session(cl_fd);
+                cout<<"get connect from "<<peer_ip<<":"<<peer_port<<endl;
+                Session *s=new Session(cl_fd,peer_ip,peer_port);
+                s->end_this=bind(&Tcpserver::quit_session,this,placeholders::_1);
                 clients.push_back(s);
             }
-
         }
     }
     void send_test()
@@ -90,11 +122,38 @@ public:
             clients[0]->send("123456",6);
         }
     }
-
+    void size()
+    {
+ cout<<clients.size();
+    }
 private:
+    void quit_session(Session *s)
+    {
+      //  delete s;
+        vector <Session *>::iterator e=find(clients.begin(),clients.end(),s);
+      clients.erase(e);
+        thread([s](){
+        //   cout<<"try to delete "<<s->ip()<<endl;
+           // this_thread::sleep_for(chrono::milliseconds(100));
+            delete s;
+ // cout<<"try to delete  "<<s->ip()<<"done"<<endl;
+        }).detach();
+//        cout<<"quiting"<<endl;
+//        cout<<s->ip()<<endl;
+   //     vector <Session *>::iterator e=find(clients.begin(),clients.end(),s);
+//   //     delete s;
+ //         clients.erase(e);
+//        cout<<"done"<<endl;
+    }
+
+    bool quit;
     int port;
+    std::thread *trd;
+    unsigned short peer_port;
     int fd;
     vector <Session *> clients;
+    char peer_ip[IP_STR_LEN];
+
 };
 namespace Ui {
 class MainWindow;
@@ -112,9 +171,11 @@ public:
 private slots:
     void on_pushButton_clicked();
 
+    void on_pushButton_2_clicked();
+
 private:
     Ui::MainWindow *ui;
-        Tcpserver server;
+    Tcpserver server;
 };
 
 #endif // MAINWINDOW_H

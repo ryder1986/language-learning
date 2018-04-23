@@ -272,6 +272,30 @@ int RecvDataByTcp(int sock,char* buffer,int len)
     return offset;
 }
 
+int RecvDataByTcp1(int sock,char* buffer,int len)
+{
+    //prt(info,"get buffer len : %d",len);
+    int offset=0;
+    while(len>0){
+        int re = recv(sock,buffer+offset,len,0);
+        if(re<=0){
+            if(re<0 && EINTR == errno){
+                //Log0("recv continue: re[%d] errno:[%s]", re, strerror(errno));
+                continue;
+            }
+            else{
+                //Log0("recv error: re[%d] errno:[%s]", re, strerror(errno));
+                return offset;
+            }
+        }
+        offset += re;
+        return offset;
+//        len -= re;
+//        offset += re;
+    }
+    return offset;
+}
+
 //int RecvDataByTcp(int sock,char* buffer,int len){
 	//int re = recv(sock,buffer+offset,len,0);
 	

@@ -19,3 +19,8 @@ void MainWindow::on_pushButton_clicked()
 {
     server.send_test();
 }
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    server.size();
+}
