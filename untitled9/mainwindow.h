@@ -24,7 +24,7 @@ public:
     }
     ~Session()
     {
-         cout<<"session deleteing "<<ip()<<endl;
+        cout<<"session deleteing "<<ip()<<endl;
         quit=true;
         trd->join();
         delete trd;
@@ -124,26 +124,26 @@ public:
     }
     void size()
     {
- cout<<clients.size();
+        cout<<clients.size();
     }
 private:
     void quit_session(Session *s)
     {
-      //  delete s;
+        //  delete s;
         vector <Session *>::iterator e=find(clients.begin(),clients.end(),s);
-      clients.erase(e);
+        clients.erase(e);
         thread([s](){
-        //   cout<<"try to delete "<<s->ip()<<endl;
-           // this_thread::sleep_for(chrono::milliseconds(100));
+            //   cout<<"try to delete "<<s->ip()<<endl;
+            // this_thread::sleep_for(chrono::milliseconds(100));
             delete s;
- // cout<<"try to delete  "<<s->ip()<<"done"<<endl;
+            // cout<<"try to delete  "<<s->ip()<<"done"<<endl;
         }).detach();
-//        cout<<"quiting"<<endl;
-//        cout<<s->ip()<<endl;
-   //     vector <Session *>::iterator e=find(clients.begin(),clients.end(),s);
-//   //     delete s;
- //         clients.erase(e);
-//        cout<<"done"<<endl;
+        //        cout<<"quiting"<<endl;
+        //        cout<<s->ip()<<endl;
+        //     vector <Session *>::iterator e=find(clients.begin(),clients.end(),s);
+        //   //     delete s;
+        //         clients.erase(e);
+        //        cout<<"done"<<endl;
     }
 
     bool quit;
